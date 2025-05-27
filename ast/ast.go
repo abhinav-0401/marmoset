@@ -31,5 +31,18 @@ func (p *Program) TokenLiteral() string {
 }
 
 type LetStmt struct {
-	Token token.Token
+	Token  token.Token
+	Symbol *Ident
+	Value  Expr
 }
+
+func (ls *LetStmt) TokenLiteral() string { return ls.Token.Literal }
+func (ls *LetStmt) stmtNode()            {}
+
+type Ident struct {
+	Token token.Token
+	Name  string
+}
+
+func (i *Ident) TokenLiteral() string { return i.Token.Literal }
+func (i *Ident) exprNode()            {}
