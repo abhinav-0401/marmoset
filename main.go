@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	fmt.Printf("Hello %s! This is the Monkey programming language!\n")
+	fmt.Printf("Hello! This is the Monkey programming language!\n")
 	fmt.Printf("Feel free to type in commands\n")
 	repl.Start(os.Stdin, os.Stdout)
 }

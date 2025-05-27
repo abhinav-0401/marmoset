@@ -52,13 +52,16 @@ func (p *Parser) parseStmt() ast.Stmt {
 }
 
 func (p *Parser) parseLetStmt() *ast.LetStmt {
-	var stmt = &ast.LetStmt{}
+	var stmt = &ast.LetStmt{Token: p.currToken}
 
 	if !p.expectPeek(token.IDENT) {
 		return nil
 	}
 
-	var ident = &ast.Ident{Name: p.currToken.Literal}
+	var ident = &ast.Ident{
+		Token: p.currToken,
+		Name:  p.currToken.Literal,
+	}
 
 	if !p.expectPeek(token.ASSIGN) {
 		return nil
@@ -67,6 +70,8 @@ func (p *Parser) parseLetStmt() *ast.LetStmt {
 	for !p.currTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}
+
+	stmt.Symbol = ident
 
 	return stmt
 }
