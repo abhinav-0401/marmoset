@@ -10,6 +10,21 @@ type Parser struct {
 	l         *lexer.Lexer
 	currToken token.Token
 	peekToken token.Token
+
+	prefixParseFns map[token.TokenType]prefixParseFn
+	infixParseFns  map[token.TokenType]infixParseFn
+}
+
+type (
+	prefixParseFn func() ast.Expr
+	infixParseFn  func(left ast.Expr) ast.Expr
+)
+
+func (p *Parser) registerPrefix(tokenType token.TokenType, fn prefixParseFn) {
+	p.prefixParseFns[tokenType] = fn
+}
+func (p *Parser) registerInfix(tokenType token.TokenType, fn infixParseFn) {
+	p.infixParseFns[tokenType] = fn
 }
 
 func New(l *lexer.Lexer) *Parser {
@@ -35,7 +50,9 @@ func (p *Parser) ParseProgram() *ast.Program {
 	for p.currToken.Type != token.EOF {
 		var stmt ast.Stmt = p.parseStmt()
 
-		program.Stmts = append(program.Stmts, stmt)
+		if stmt != nil {
+			program.Stmts = append(program.Stmts, stmt)
+		}
 		p.nextToken()
 	}
 
@@ -46,8 +63,10 @@ func (p *Parser) parseStmt() ast.Stmt {
 	switch p.currToken.Type {
 	case token.LET:
 		return p.parseLetStmt()
+	case token.RETURN:
+		return p.parseReturnStmt()
 	default:
-		return nil
+		return p.parseExprStmt()
 	}
 }
 
@@ -73,6 +92,22 @@ func (p *Parser) parseLetStmt() *ast.LetStmt {
 
 	stmt.Symbol = ident
 
+	return stmt
+}
+
+func (p *Parser) parseReturnStmt() *ast.ReturnStmt {
+	var stmt = &ast.ReturnStmt{Token: p.currToken}
+
+	p.nextToken()
+	for !p.currTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
+
+	return stmt
+}
+
+func (p *Parser) parseExprStmt() *ast.ExprStmt {
+	var stmt = &ast.ExprStmt{Token: p.currToken}
 	return stmt
 }
 

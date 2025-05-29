@@ -46,3 +46,19 @@ type Ident struct {
 
 func (i *Ident) TokenLiteral() string { return i.Token.Literal }
 func (i *Ident) exprNode()            {}
+
+type ReturnStmt struct {
+	Token       token.Token
+	ReturnValue Expr
+}
+
+func (rs *ReturnStmt) TokenLiteral() string { return rs.Token.Literal }
+func (rs *ReturnStmt) stmtNode()            {}
+
+type ExprStmt struct {
+	Token      token.Token
+	Expression Expr
+}
+
+func (es *ExprStmt) TokenLiteral() string { return es.Token.Literal }
+func (es *ExprStmt) stmtNode()            {}
